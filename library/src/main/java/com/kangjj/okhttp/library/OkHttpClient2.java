@@ -13,20 +13,34 @@ import android.widget.Button;
 public class OkHttpClient2 {
 
     private Dispatcher2 dispatcher;
+
+    int recount;
+
     public OkHttpClient2(){
         this(new Builder());
     };
 
     public OkHttpClient2(Builder builder){
         this.dispatcher = builder.dispatcher;
+        this.recount = builder.recount;
+    }
+
+    public int getRecout() {
+        return recount;
     }
 
     public final static class Builder{
         Dispatcher2 dispatcher;
+        int recount = 3;
 //        boolean isCanceled;
 
         public Builder(){
             dispatcher = new Dispatcher2();
+        }
+
+        public Builder setReCount(int recount) {
+            this.recount = recount;
+            return this;
         }
 
         public Builder dispatcher(Dispatcher2 dispatcher){

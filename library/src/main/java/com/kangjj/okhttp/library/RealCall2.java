@@ -1,6 +1,14 @@
 package com.kangjj.okhttp.library;
 
+import com.kangjj.okhttp.library.chain.ChainManager;
+import com.kangjj.okhttp.library.chain.ConnectionServerInterceptor;
+import com.kangjj.okhttp.library.chain.Interceptor2;
+import com.kangjj.okhttp.library.chain.RequestHeaderInterceptor;
+
 import java.io.IOException;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @Description:
@@ -10,13 +18,17 @@ import java.io.IOException;
  * @Package: com.kangjj.okhttp.library
  * @CreateDate: 2019/12/3 15:38
  */
-class RealCall2 implements Call2 {
+public class RealCall2 implements Call2 {
     private final OkHttpClient2 okHttpClient;
     private final Request2 request;
 
     private boolean executed;
 
     private volatile boolean canceled;
+
+    public OkHttpClient2 getOkHttpClient() {
+        return okHttpClient;
+    }
 
     public RealCall2(OkHttpClient2 okHttpClient, Request2 request) {
         this.okHttpClient= okHttpClient;
@@ -79,9 +91,14 @@ class RealCall2 implements Call2 {
         }
 
         private Response2 getResponseWithInterceptorChain() throws IOException{
-            Response2 response = new Response2();
-            response.setBody("流程走通...");
-            return response;
+            List<Interceptor2> interceptorList = new ArrayList<>();
+            interceptorList.add(new RequestHeaderInterceptor());
+            interceptorList.add(new RequestHeaderInterceptor());
+            interceptorList.add(new ConnectionServerInterceptor());
+
+            ChainManager chainManager = new ChainManager(interceptorList,0,request,RealCall2.this);
+
+            return chainManager.getResponse(request);
         }
 
     }

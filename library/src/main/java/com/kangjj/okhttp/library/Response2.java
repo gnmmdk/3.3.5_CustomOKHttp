@@ -11,6 +11,15 @@ package com.kangjj.okhttp.library;
 public class Response2 {
 
     private String body;
+    private int statusCode;
+
+    public int getStatusCode() {
+        return statusCode;
+    }
+
+    public void setStatusCode(int statusCode) {
+        this.statusCode = statusCode;
+    }
 
     public String getBody(){
         return body;
@@ -23,4 +32,5 @@ public class Response2 {
     public String string(){
         return body;
     }
+
 }
