@@ -34,7 +34,7 @@ public class RequestHeaderInterceptor implements Interceptor2 {
              * Content-Length: 48
              * Content-Type: application/x-www-form-urlencoded
              */
-            mHeadList.put("Content-Length",request.getRequestBody().getBody());
+            mHeadList.put("Content-Length",request.getRequestBody().getBody().length()+"");
             mHeadList.put("Content-Type", RequestBody2.TYPE);
         }
         return chain.getResponse(request);

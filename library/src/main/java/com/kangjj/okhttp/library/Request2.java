@@ -31,6 +31,7 @@ public class Request2 {
         this.url = builder.url;
         this.requetMethod = builder.requetMethod;
         this.mHeadList = builder.mHeadList;
+        this.requestBody = builder.requestBody;
     }
 
     public String getUrl() {
