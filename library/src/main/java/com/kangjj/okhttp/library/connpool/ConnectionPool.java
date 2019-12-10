@@ -107,6 +107,7 @@ public class ConnectionPool {
                 // 等待一段时间后，再去检查，是否要去清理
                 synchronized(ConnectionPool.this){
                     try {
+                        Log.d("cleanRunnable", "nextCheckCleanTime="+nextCheckCleanTime);
                         ConnectionPool.this.wait(nextCheckCleanTime);//必须加锁
                     } catch (InterruptedException e) {
                         e.printStackTrace();
