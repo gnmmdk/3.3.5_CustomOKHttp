@@ -1,5 +1,6 @@
 package com.kangjj.okhttp.library.connpool;
 
+import android.text.TextUtils;
 import android.util.Log;
 
 import java.util.ArrayDeque;
@@ -24,7 +25,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class ConnectionPool {
     //容器（双端队列）用于保存连接对象
-    private static Deque<HttpConnection> httpConnectionDeque = null;
+    private Deque<HttpConnection> httpConnectionDeque = null;
     //清理标记
     private boolean cleanRunnableFlag;
     //清理监测机制 每隔一分钟就去检查 连接池里面是否有可用的连接对象，如果不可用，就移除
@@ -63,7 +64,7 @@ public class ConnectionPool {
      * @param port
      * @return
      */
-    public HttpConnection getConnection(String host,int port){
+    public synchronized HttpConnection getConnection(String host,int port){
         Iterator<HttpConnection> iterator = httpConnectionDeque.iterator();
         while (iterator.hasNext()) {
             HttpConnection httpConnection = iterator.next();
@@ -96,21 +97,25 @@ public class ConnectionPool {
     private Runnable cleanRunnable = new Runnable() {
         @Override
         public void run() {
-            // 获取下一次检测的时间
-            long nextCheckCleanTime = clean(System.currentTimeMillis());
-            if(-1 == nextCheckCleanTime){
-                cleanRunnableFlag = false;
-                Log.d("cleanRunnable", "-1 == nextCheckCleanTime ");
-                return;//TODO 直接return 后续的Socket一超时不用关闭了吗？
-            }
-            if(nextCheckCleanTime > 0){
-                // 等待一段时间后，再去检查，是否要去清理
-                synchronized(ConnectionPool.this){
-                    try {
-                        Log.d("cleanRunnable", "nextCheckCleanTime="+nextCheckCleanTime);
-                        ConnectionPool.this.wait(nextCheckCleanTime);//必须加锁
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
+            while (true) {
+                // 获取下一次检测的时间
+                long nextCheckCleanTime = clean(System.currentTimeMillis());
+                if(-1 == nextCheckCleanTime){
+                    cleanRunnableFlag = false;
+                    Log.d("cleanRunnable", "-1 == nextCheckCleanTime ");
+                    return;//TODO 直接return 后续的Socket一超时不用关闭了吗？
+                }
+                if(nextCheckCleanTime > 0){
+                    // 等待一段时间后，再去检查，是否要去清理
+                    synchronized(ConnectionPool.this){
+                        try {
+                            Log.d("cleanRunnable", "nextCheckCleanTime="+nextCheckCleanTime);
+                            ConnectionPool.this.wait(nextCheckCleanTime);//必须加锁
+                            Log.d("cleanRunnable", "nextCheckCleanTime2");
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                            Log.d("cleanRunnable", e.toString());
+                        }
                     }
                 }
             }
@@ -145,8 +150,12 @@ public class ConnectionPool {
                 }
 
             }//end while
-
+            //循环出来后，idleRecordSave = 计算完毕（闲置之间）
+            if(idleRecordSave >=0){
+                return keepAlive-idleRecordSave;
+            }
         }
         return idleRecordSave;
     }
+
 }

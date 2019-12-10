@@ -3,9 +3,14 @@ package com.kangjj.okhttp.library.chain;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.kangjj.okhttp.library.OkHttpClient2;
+import com.kangjj.okhttp.library.RealCall2;
 import com.kangjj.okhttp.library.Request2;
 import com.kangjj.okhttp.library.Response2;
 import com.kangjj.okhttp.library.SocketRequestServer;
+import com.kangjj.okhttp.library.connpool.ConnectionPool;
+import com.kangjj.okhttp.library.connpool.HttpConnection;
+import com.kangjj.okhttp.library.connpool.UseConnectionPool;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -32,20 +37,34 @@ public class ConnectionServerInterceptor implements Interceptor2 {
 
         SocketRequestServer srs = new SocketRequestServer();
         Request2 request = chain.getRequest();
-        Socket socket = null;
+
+        ChainManager chainManager = (ChainManager) chain;
+
+        RealCall2 realCall = chainManager.getCall();
+        OkHttpClient2 client = realCall.getOkHttpClient();
+        ConnectionPool connectionPool = client.getConnectionPool();
 
         String protocol = srs.queryHttpOrHttps(request.getUrl());
-        if(TextUtils.isEmpty(protocol)){
-            throw new IllegalArgumentException("protocol 不能为空");
+
+        String host =srs.getHost(request);
+        int port =srs.getPort(request);
+//        UseConnectionPool useConnectionPool = new UseConnectionPool();
+//        useConnectionPool.useConnectionPool(connectionPool,host,port,protocol);
+
+        // 开始模拟 连接服务器拦截器的动作
+        // 首先从连接池里面获取，是否有连接对象可用
+        HttpConnection httpConnection = connectionPool.getConnection(host,port);
+        if(httpConnection == null){
+            httpConnection = new HttpConnection(host,port,protocol);
+            Log.d(TAG, "连接池里面没有 连接对象 ，需要实例化一个连接对象...");
+        }else{
+            Log.d(TAG, "复用池 里面有一个连接对象");
         }
-        if("HTTP".equalsIgnoreCase(protocol)){
-            socket = new Socket(srs.getHost(request),srs.getPort(request));
-        }else if("HTTPS".equalsIgnoreCase(protocol)){
-            socket = SSLSocketFactory.getDefault().createSocket(srs.getHost(request),srs.getPort(request));
-        }
-        if(socket == null){
-            throw new IllegalArgumentException("socket 未初始化");
-        }
+//        // 模拟请求
+//        // ....
+//        Log.d(TAG, "给服务器 发送请求...");
+        Socket socket= httpConnection.getSocket();
+
         //请求
         OutputStream os = socket.getOutputStream();
         BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(os));
@@ -70,7 +89,21 @@ public class ConnectionServerInterceptor implements Interceptor2 {
             }
         }catch (IOException e){
             e.printStackTrace();
+        }finally {
+            httpConnection.hasUseTime = System.currentTimeMillis();
+            connectionPool.putConnection(httpConnection);
+            if(os!=null){       //记得必须关闭流，否则socket重新调用会获取不到数据
+                os.close();
+            }
+            if(bufferedWriter!=null){
+                bufferedWriter.close();
+            }
+            if(bufferedReader!=null){
+                bufferedWriter.close();
+            }
         }
+
+
 
         // input
 //        new Thread(){

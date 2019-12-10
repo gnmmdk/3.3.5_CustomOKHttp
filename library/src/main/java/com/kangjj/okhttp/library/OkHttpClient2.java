@@ -2,6 +2,8 @@ package com.kangjj.okhttp.library;
 
 import android.widget.Button;
 
+import com.kangjj.okhttp.library.connpool.ConnectionPool;
+
 /**
  * @Description:
  * @Author: jj.kang
@@ -13,7 +15,7 @@ import android.widget.Button;
 public class OkHttpClient2 {
 
     private Dispatcher2 dispatcher;
-
+    private ConnectionPool connectionPool;
     int recount;
 
     public OkHttpClient2(){
@@ -23,19 +25,26 @@ public class OkHttpClient2 {
     public OkHttpClient2(Builder builder){
         this.dispatcher = builder.dispatcher;
         this.recount = builder.recount;
+        this.connectionPool = builder.connectionPool;
     }
 
     public int getRecout() {
         return recount;
     }
 
+    public ConnectionPool getConnectionPool() {
+        return connectionPool;
+    }
+
     public final static class Builder{
         Dispatcher2 dispatcher;
         int recount = 3;
+        ConnectionPool connectionPool;
 //        boolean isCanceled;
 
         public Builder(){
             dispatcher = new Dispatcher2();
+            connectionPool = new ConnectionPool();
         }
 
         public Builder setReCount(int recount) {

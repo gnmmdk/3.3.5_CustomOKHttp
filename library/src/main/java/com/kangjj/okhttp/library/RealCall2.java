@@ -3,6 +3,7 @@ package com.kangjj.okhttp.library;
 import com.kangjj.okhttp.library.chain.ChainManager;
 import com.kangjj.okhttp.library.chain.ConnectionServerInterceptor;
 import com.kangjj.okhttp.library.chain.Interceptor2;
+import com.kangjj.okhttp.library.chain.ReRequestInterceptor;
 import com.kangjj.okhttp.library.chain.RequestHeaderInterceptor;
 
 import java.io.IOException;
@@ -92,7 +93,7 @@ public class RealCall2 implements Call2 {
 
         private Response2 getResponseWithInterceptorChain() throws IOException{
             List<Interceptor2> interceptorList = new ArrayList<>();
-            interceptorList.add(new RequestHeaderInterceptor());
+            interceptorList.add(new ReRequestInterceptor());
             interceptorList.add(new RequestHeaderInterceptor());
             interceptorList.add(new ConnectionServerInterceptor());
 

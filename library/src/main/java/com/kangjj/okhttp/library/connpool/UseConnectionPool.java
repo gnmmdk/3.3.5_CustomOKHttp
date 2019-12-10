@@ -12,12 +12,12 @@ import android.util.Log;
  */
 public class UseConnectionPool {
     private final static String TAG = UseConnectionPool.class.getSimpleName();
-    public void useConnectionPool(ConnectionPool connectionPool,String host,int port){
+    public void useConnectionPool(ConnectionPool connectionPool,String host,int port,String protocol){
         // 开始模拟 连接服务器拦截器的动作
         // 首先从连接池里面获取，是否有连接对象可用
         HttpConnection httpConnection = connectionPool.getConnection(host,port);
         if(httpConnection == null){
-            httpConnection = new HttpConnection(host,port);
+            httpConnection = new HttpConnection(host,port,protocol);
             Log.d(TAG, "连接池里面没有 连接对象 ，需要实例化一个连接对象...");
         }else{
             Log.d(TAG, "复用池 里面有一个连接对象");

@@ -58,9 +58,11 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-
+    private OkHttpClient2 okHttpClient2;
     public void useMyOkhttp(View view) {
-        OkHttpClient2 okHttpClient2 = new OkHttpClient2.Builder().build();
+        if(okHttpClient2==null) {
+            okHttpClient2 = new OkHttpClient2.Builder().build();
+        }
 
         RequestBody2 requestBody = new RequestBody2();
         requestBody.addBody("city","110101");
@@ -85,7 +87,8 @@ public class MainActivity extends AppCompatActivity {
     ConnectionPool connectionPool = null;
     public void testConnectionPool(View view) {
         if(connectionPool==null){
-            connectionPool = new ConnectionPool();
+        connectionPool = new ConnectionPool();
+//        final ConnectionPool connectionPool = new ConnectionPool();
         }
         // 在OkHttp里面开了线程池，我们这里就直接用Thread了
         new Thread() {
@@ -94,11 +97,11 @@ public class MainActivity extends AppCompatActivity {
                 super.run();
 
                 UseConnectionPool useConnectonPool = new UseConnectionPool();
-                useConnectonPool.useConnectionPool(connectionPool, "restapi.amap.com", 80);
-                useConnectonPool.useConnectionPool(connectionPool, "restapi.amap.com", 80);
-                useConnectonPool.useConnectionPool(connectionPool, "restapi.amap.com", 80);
-                useConnectonPool.useConnectionPool(connectionPool, "restapi.amap.com", 80);
-                useConnectonPool.useConnectionPool(connectionPool, "restapi.amap.com", 80);
+                useConnectonPool.useConnectionPool(connectionPool, "restapi.amap.com", 80,"HTTP");
+                useConnectonPool.useConnectionPool(connectionPool, "restapi.amap.com", 80,"HTTP");
+                useConnectonPool.useConnectionPool(connectionPool, "restapi.amap.com", 80,"HTTP");
+                useConnectonPool.useConnectionPool(connectionPool, "restapi.amap.com", 80,"HTTP");
+                useConnectonPool.useConnectionPool(connectionPool, "restapi.amap.com", 80,"HTTP");
             }
         }.start();
     }

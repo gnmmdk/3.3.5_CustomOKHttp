@@ -1,10 +1,13 @@
 package com.kangjj.okhttp.library.connpool;
 
+import android.text.TextUtils;
 import android.util.Log;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.Socket;
+
+import javax.net.ssl.SSLSocketFactory;
 
 /**
  * @Description: 连接对象对socke的封装
@@ -19,9 +22,20 @@ public class HttpConnection {
 
     Socket socket;
     public long hasUseTime; //连接对象 最后使用的时间
-    public HttpConnection(String host,int port){
+    public HttpConnection(String host,int port,String protocol){
         try {
-            socket = new Socket(host,port);
+
+            if(TextUtils.isEmpty(protocol)){
+                throw new IllegalArgumentException("protocol 不能为空");
+            }
+            if("HTTP".equalsIgnoreCase(protocol)){
+                socket = new Socket(host,port);
+            }else if("HTTPS".equalsIgnoreCase(protocol)){
+                socket = SSLSocketFactory.getDefault().createSocket(host,port);
+            }
+            if(socket == null){
+                throw new IllegalArgumentException("socket 未初始化");
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -49,5 +63,9 @@ public class HttpConnection {
                 Log.d(TAG, "closeSocket: IOException e:" + e.getMessage());
             }
         }
+    }
+
+    public Socket getSocket(){
+        return socket;
     }
 }
