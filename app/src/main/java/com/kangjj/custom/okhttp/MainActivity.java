@@ -2,7 +2,6 @@ package com.kangjj.custom.okhttp;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.content.pm.PackageInfo;
 import android.os.Bundle;
 import android.view.View;
 
@@ -12,6 +11,8 @@ import com.kangjj.okhttp.library.OkHttpClient2;
 import com.kangjj.okhttp.library.Request2;
 import com.kangjj.okhttp.library.RequestBody2;
 import com.kangjj.okhttp.library.Response2;
+import com.kangjj.okhttp.library.connpool.ConnectionPool;
+import com.kangjj.okhttp.library.connpool.UseConnectionPool;
 
 import java.io.IOException;
 
@@ -80,5 +81,25 @@ public class MainActivity extends AppCompatActivity {
                 System.out.println("OKHTTP请求成功.... result:" + response.getBody() + " 请求结果码：" + response.getStatusCode());
             }
         });
+    }
+    ConnectionPool connectionPool = null;
+    public void testConnectionPool(View view) {
+        if(connectionPool==null){
+            connectionPool = new ConnectionPool();
+        }
+        // 在OkHttp里面开了线程池，我们这里就直接用Thread了
+        new Thread() {
+            @Override
+            public void run() {
+                super.run();
+
+                UseConnectionPool useConnectonPool = new UseConnectionPool();
+                useConnectonPool.useConnectionPool(connectionPool, "restapi.amap.com", 80);
+                useConnectonPool.useConnectionPool(connectionPool, "restapi.amap.com", 80);
+                useConnectonPool.useConnectionPool(connectionPool, "restapi.amap.com", 80);
+                useConnectonPool.useConnectionPool(connectionPool, "restapi.amap.com", 80);
+                useConnectonPool.useConnectionPool(connectionPool, "restapi.amap.com", 80);
+            }
+        }.start();
     }
 }
