@@ -65,6 +65,13 @@ public class SocketRequestServer {
 
     /**
      * 获取请求头的所有信息
+     * GET v3/weather/weatherInfo?city=110101&key=13cb58f5884f9749287abbead9c658f2 HTTP/1.1
+     * Host: restapi.amap.com\r\n
+     * Content-Length: 48\r\n
+     * Content-Type: application/x-www-form-urlencoded\r\n
+     *  \r\n    // 拼接空行，代表下面的POST，请求体了
+     *  city=110101&key=13cb58f5884f9749287abbead9c658f2
+     *
      * @param request
      * @return
      */

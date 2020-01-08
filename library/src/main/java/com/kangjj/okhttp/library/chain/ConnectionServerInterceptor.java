@@ -73,6 +73,8 @@ public class ConnectionServerInterceptor implements Interceptor2 {
         bufferedWriter.write(requestAll);
         bufferedWriter.flush();
 
+        socket.shutdownOutput();//这句是socket的输入流，有些地方不加这句readLine会阻塞
+
         final BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         Response2 response = new Response2();
         //取出响应码
